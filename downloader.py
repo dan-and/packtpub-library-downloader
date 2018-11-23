@@ -4,6 +4,7 @@ from __future__ import print_function
 import os
 import requests
 import sys, getopt
+from importlib import reload
 import json
 from lxml import html
 
@@ -369,6 +370,7 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    reload(sys)
-    sys.setdefaultencoding('utf8')
+    if sys.version_info[0] < 3:
+        reload(sys)
+        sys.setdefaultencoding('utf8')
     main(sys.argv[1:])
