@@ -283,7 +283,7 @@ def download_course(course, directory, assets, session, headers):
     if len(course_url) > 0 and 'course' in assets:
         filename = os.path.join(course_directory, title + " [course].zip")
         print("Downloading COURSE")
-        download_to_file(filename, course[0], session, headers)
+        download_to_file(filename, course_url[0], session, headers)
 
     # code
     if len(code) > 0 and 'code' in assets:
