@@ -4,19 +4,25 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 
 
 ## Usage:
-	python downloader.py -e <email> -p <password> [-d <directory> -b <book assets> -v <video assets>]
+	python downloader.py -e <email> -p <password> [-d <directory> -b <book assets> -v <video assets> -C <configuration file>]
 
 ##### Example: Download books in PDF and EPUB formats and accompanying source code
 	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,code
+	python downloader.py -C config.json -d ~/Desktop/packt -b pdf,epub,code
 
 ##### Example: Download videos, their cover image, and accompanying source code
 	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -v video,cover,code
+	python downloader.py -C config.json -d ~/Desktop/packt -v video,cover,code
 
 ##### Example: Download Integrated Courses (Interactive-Ebooks), their cover image, and accompanying source code
 	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -c course,cover,code
+	python downloader.py -C config.json -d ~/Desktop/packt -c course,cover,code
 
 ##### Example: Download everything
 	python downloader.py -e hello@world.com -p p@ssw0rd -d ~/Desktop/packt -b pdf,epub,mobi,cover,code,info -v video,cover,code,info -c course,cover,code,info
+
+##### Example: use a configuration file instead of command line username and password
+	python downloader.py -C config.json -d ~/Desktop/packt -b pdf,epub,code
 
 
 ## Commandline Options
@@ -26,6 +32,7 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 - *-v*, *--videos* = Assets to download. Options are: *video,cover,code,info*
 - *-b*, *--books* = Assets to download. Options are: *pdf,mobi,epub,cover,code,info*
 - *-c*, *--courses* = Assets to download. Options are: *course,cover,code,info*
+- *-C*, *--config* = A configuration file holding your authentication details (see config.sample.json)
 
 **Video Assets**
 
@@ -63,5 +70,8 @@ Automatically download all your eBooks and videos. (See: [PacktPub Free Daily Bo
 * [lxml](http://lxml.de/) for HTML parsing:
 
 		pip install lxml
+
+### Install dependencies:
+	pip install -r requirements.txt
 
 Tested working on Python 2.7.11 and Python 3.6.0 :: Anaconda 4.3.0 (64-bit)
