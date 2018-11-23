@@ -147,6 +147,35 @@ def download_book(book, directory, assets, session, headers):
     if not os.listdir(book_directory):
         os.rmdir(book_directory)
 
+# creates a json file with info
+def save_video_details(video, title, directory, session, headers):
+
+    # fetch the product page
+    product_url = video.xpath(".//div[contains(@class,'product-thumbnail')]//a/@href")
+    product_page = session.get("https://www.packtpub.com" + product_url[0], verify=True, headers=headers)
+    product_tree = html.fromstring(product_page.content)
+
+    # the video details section
+    info = product_tree.xpath("//*[@id='main-book']//div[contains(@class,'book-info-wrapper')]")
+
+    # any details?
+    if len(info) > 0:
+
+        # unformatted video title
+        original_title = video.xpath("@title")[0]
+
+        # the json elements
+        info_dict = {'originalTitle':original_title}
+        info_dict['isbn'] = info[0].xpath(".//span[@itemprop='isbn']/text()")[0]
+        info_dict['Course Length'] = info[0].xpath(".//span[@itemprop='numberOfPages']/text()")[0]
+        info_dict['description'] = '<br>'.join(info[0].xpath(".//div[@itemprop='description']/p/text()"))
+
+        print ("Saving INFO")
+
+        # save to file
+        filename = os.path.join(directory, title + ".json")
+        with open(filename, 'w') as outfile:
+            json.dump(info_dict, outfile)
 
 # download video
 def download_video(video, directory, assets, session, headers):
@@ -168,13 +197,13 @@ def download_video(video, directory, assets, session, headers):
     # get the download links
     code = video.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/code_download')]/@href")
     image = video.xpath(".//div[contains(@class,'product-thumbnail')]//img/@src")
-    video = video.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/video')]/@href")
+    video_url = video.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/video')]/@href")
 
     # video
     if len(video) > 0 and 'video' in assets:
         filename = os.path.join(video_directory, title + " [VIDEO].zip")
         print("Downloading VIDEO")
-        download_to_file(filename, video[0], session, headers)
+        download_to_file(filename, video_url[0], session, headers)
 
     # code
     if len(code) > 0 and 'code' in assets:
@@ -185,13 +214,48 @@ def download_video(video, directory, assets, session, headers):
     # cover image
     if len(image) > 0 and 'cover' in assets:
         filename = os.path.join(video_directory, title + ".jpg")
-        image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
+        image_url = image[0].replace("/imagecache/thumbview", "", 1)
         print("Downloading IMAGE")
         download_to_file(filename, image_url, session, headers, False)
+
+    # video details
+    if 'info' in assets:
+        save_video_details(video, title, video_directory, session, headers)
+ 
 
     # delete directory if it's empty
     if not os.listdir(video_directory):
         os.rmdir(video_directory)
+
+# creates a json file with info
+def save_course_details(course, title, directory, session, headers):
+
+    # fetch the product page
+    product_url = course.xpath(".//div[contains(@class,'product-thumbnail')]//a/@href")
+    product_page = session.get("https://www.packtpub.com" + product_url[0], verify=True, headers=headers)
+    product_tree = html.fromstring(product_page.content)
+
+    # the course details section
+    info = product_tree.xpath("//*[@id='main-book']//div[contains(@class,'book-info-wrapper')]")
+
+    # any details?
+    if len(info) > 0:
+
+        # unformatted course title
+        original_title = course.xpath("@title")[0]
+
+        # the json elements
+        info_dict = {'originalTitle':original_title}
+        info_dict['isbn'] = info[0].xpath(".//span[@itemprop='isbn']/text()")[0]
+        info_dict['Course Length'] = info[0].xpath(".//span[@itemprop='numberOfPages']/text()")[0]
+        info_dict['description'] = '<br>'.join(info[0].xpath(".//div[@itemprop='description']/p/text()"))
+
+        print ("Saving INFO")
+
+        # save to file
+        filename = os.path.join(directory, title + ".json")
+        with open(filename, 'w') as outfile:
+            json.dump(info_dict, outfile)
 
 # download course
 def download_course(course, directory, assets, session, headers):
@@ -213,10 +277,10 @@ def download_course(course, directory, assets, session, headers):
     # get the download links
     code = course.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/code_download')]/@href")
     image = course.xpath(".//div[contains(@class,'product-thumbnail')]//img/@src")
-    course = course.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/video_download')]/@href")
+    course_url = course.xpath(".//div[contains(@class,'download-container')]//a[contains(@href,'/video_download')]/@href")
 
     # course
-    if len(course) > 0 and 'course' in assets:
+    if len(course_url) > 0 and 'course' in assets:
         filename = os.path.join(course_directory, title + " [course].zip")
         print("Downloading COURSE")
         download_to_file(filename, course[0], session, headers)
@@ -230,9 +294,15 @@ def download_course(course, directory, assets, session, headers):
     # cover image
     if len(image) > 0 and 'cover' in assets:
         filename = os.path.join(course_directory, title + ".jpg")
-        image_url = "https:" + image[0].replace("/imagecache/thumbview", "", 1)
+        image_url = image[0].replace("/imagecache/thumbview", "", 1)
         print("Downloading IMAGE")
         download_to_file(filename, image_url, session, headers, False)
+
+    # course details
+    if 'info' in assets:
+        save_course_details(course, title, course_directory, session, headers)
+
+
 
     # delete directory if it's empty
     if not os.listdir(course_directory):
